@@ -1,6 +1,7 @@
 from django.db import models
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel
 from wagtail.snippets.models import register_snippet
+from wagtail.models import Page
 
 @register_snippet
 class Product(models.Model):
