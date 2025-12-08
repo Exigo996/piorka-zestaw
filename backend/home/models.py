@@ -1,9 +1,7 @@
 from django.db import models
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel
-from wagtail.snippets.models import register_snippet
 from wagtail.models import Page
 
-@register_snippet
 class Product(models.Model):
     name = models.CharField(max_length=255)
     slug = models.SlugField(unique=True)
@@ -12,6 +10,7 @@ class Product(models.Model):
     stripe_price_id = models.CharField(max_length=255, blank=True, help_text="Stripe Price ID for checkout")
     stripe_product_id = models.CharField(max_length=255, blank=True, help_text="Stripe Product ID")
     active = models.BooleanField(default=True)
+    featured = models.BooleanField(default=False, verbose_name="Wyróżnij na stronie głównej")
     image = models.ForeignKey(
         'wagtailimages.Image',
         null=True, blank=True,
@@ -26,6 +25,7 @@ class Product(models.Model):
             FieldPanel('name'),
             FieldPanel('slug'),
             FieldPanel('active'),
+            FieldPanel('featured'),
         ], heading="Basic Info"),
         FieldPanel('description'),
         FieldPanel('price'),
