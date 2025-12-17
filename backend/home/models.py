@@ -119,13 +119,13 @@ class Product(ClusterableModel):
 
     # New fields
     nr_w_katalogu_zdjec = models.CharField(max_length=255, blank=True, verbose_name="Nr w katalogu zdjęć")
-    przeznaczenie_ogolne = models.CharField(max_length=50, choices=PRZEZNACZENIE_CHOICES, blank=True, verbose_name="Przeznaczenie ogólne")
+    przeznaczenie_ogolne = models.CharField(max_length=100, choices=PRZEZNACZENIE_CHOICES, blank=True, verbose_name="Przeznaczenie ogólne")
     dla_kogo = models.JSONField(default=list, blank=True, verbose_name="Dla kogo")
-    dlugosc_kategoria = models.CharField(max_length=20, choices=DLUGOSC_KATEGORIA_CHOICES, blank=True, verbose_name="Długość kategoria")
+    dlugosc_kategoria = models.CharField(max_length=50, choices=DLUGOSC_KATEGORIA_CHOICES, blank=True, verbose_name="Długość kategoria")
     dlugosc_w_cm = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True, verbose_name="Długość w cm")
     kolor_pior = models.JSONField(default=list, blank=True, verbose_name="Kolor piór w przewadze")
     gatunek_ptakow = models.JSONField(default=list, blank=True, verbose_name="Pióra zgubiły (gatunek)")
-    kolor_elementow_metalowych = models.CharField(max_length=20, choices=KOLOR_METALOWYCH_CHOICES, blank=True, verbose_name="Kolor elementów metalowych")
+    kolor_elementow_metalowych = models.CharField(max_length=50, choices=KOLOR_METALOWYCH_CHOICES, blank=True, verbose_name="Kolor elementów metalowych")
     rodzaj_zapiecia = models.JSONField(default=list, blank=True, verbose_name="Rodzaj zapięcia")
 
     created_at = models.DateTimeField(auto_now_add=True)
