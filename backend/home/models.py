@@ -77,15 +77,6 @@ class Product(models.Model):
         ('nie_dotyczy', 'Nie dotyczy'),
     ]
 
-    PYTANIE_O_PRZEDMIOT_CHOICES = [
-        ('zamiana_zapiecia', 'Zamiana zapięcia'),
-        ('inna_przerobka', 'Inna przeróbka'),
-        ('szybsza_wysylka', 'Szybsza wysyłka'),
-        ('zamowienie_indywidualne', 'Zamówienie indywidualne'),
-        ('odbior_osobisty', 'Odbiór osobisty'),
-        ('inne', 'Inne'),
-    ]
-
     # Basic fields
     name = models.CharField(max_length=255, verbose_name="Nazwa (ang.)")
     tytul = models.CharField(max_length=255, blank=True, verbose_name="Nazwa (pl.)")
@@ -121,8 +112,7 @@ class Product(models.Model):
     kolor_pior = models.JSONField(default=list, blank=True, verbose_name="Kolor piór w przewadze")
     gatunek_ptakow = models.JSONField(default=list, blank=True, verbose_name="Pióra zgubiły (gatunek)")
     kolor_elementow_metalowych = models.CharField(max_length=20, choices=KOLOR_METALOWYCH_CHOICES, blank=True, verbose_name="Kolor elementów metalowych")
-    rodzaj_zapiecia = models.CharField(max_length=30, choices=RODZAJ_ZAPIECIA_CHOICES, blank=True, verbose_name="Rodzaj zapięcia")
-    pytanie_o_przedmiot = models.CharField(max_length=50, choices=PYTANIE_O_PRZEDMIOT_CHOICES, blank=True, verbose_name="Pytanie o przedmiot")
+    rodzaj_zapiecia = models.JSONField(default=list, blank=True, verbose_name="Rodzaj zapięcia")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -159,9 +149,8 @@ class Product(models.Model):
         ], heading="Pióra"),
         MultiFieldPanel([
             FieldPanel('kolor_elementow_metalowych'),
-            FieldPanel('rodzaj_zapiecia'),
+            FieldPanel('rodzaj_zapiecia', widget=CheckboxSelectMultiple(choices=RODZAJ_ZAPIECIA_CHOICES)),
         ], heading="Elementy metalowe i zapięcia"),
-        FieldPanel('pytanie_o_przedmiot'),
         MultiFieldPanel([
             FieldPanel('stripe_product_id'),
             FieldPanel('stripe_price_id'),
