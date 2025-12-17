@@ -60,9 +60,22 @@ class ProductAdminForm(ClusterForm):
             if self.instance.rodzaj_zapiecia:
                 self.fields['rodzaj_zapiecia'].initial = self.instance.rodzaj_zapiecia
 
+        # Make image field in formsets not required
+        if 'images' in self.formsets:
+            for form in self.formsets['images'].forms:
+                if 'image' in form.fields:
+                    form.fields['image'].required = False
+
     def save(self, commit=True):
-        # Let parent ClusterForm handle the save, but intercept to update JSON fields
-        # Pass commit=True to parent so formsets are handled properly
+        # Filter out empty image forms before saving
+        if hasattr(self, 'formsets') and 'images' in self.formsets:
+            # Mark empty forms for deletion
+            for form in self.formsets['images'].forms:
+                if form.cleaned_data and not form.cleaned_data.get('image'):
+                    if form.cleaned_data.get('DELETE') is not False:
+                        form.cleaned_data['DELETE'] = True
+
+        # Let parent ClusterForm handle the save
         instance = super().save(commit=commit)
 
         # Update JSONField values after save
@@ -74,9 +87,6 @@ class ProductAdminForm(ClusterForm):
         # Save again to update the JSON fields
         if commit:
             instance.save(update_fields=['dla_kogo', 'kolor_pior', 'gatunek_ptakow', 'rodzaj_zapiecia'])
-
-            # Remove any empty images that were saved
-            instance.images.filter(image__isnull=True).delete()
 
         return instance
 
