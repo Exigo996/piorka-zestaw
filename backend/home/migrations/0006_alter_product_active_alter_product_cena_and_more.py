@@ -3,68 +3,6 @@
 from django.db import migrations, models
 
 
-def convert_char_to_json(apps, schema_editor):
-    """Convert CharField values to JSON arrays"""
-    Product = apps.get_model('home', 'Product')
-    for product in Product.objects.all():
-        # Convert dla_kogo
-        if product.dla_kogo and product.dla_kogo.strip():
-            product.dla_kogo = [product.dla_kogo]
-        else:
-            product.dla_kogo = []
-
-        # Convert kolor_pior
-        if product.kolor_pior and product.kolor_pior.strip():
-            product.kolor_pior = [product.kolor_pior]
-        else:
-            product.kolor_pior = []
-
-        # Convert gatunek_ptakow
-        if product.gatunek_ptakow and product.gatunek_ptakow.strip():
-            product.gatunek_ptakow = [product.gatunek_ptakow]
-        else:
-            product.gatunek_ptakow = []
-
-        # Convert rodzaj_zapiecia
-        if product.rodzaj_zapiecia and product.rodzaj_zapiecia.strip():
-            product.rodzaj_zapiecia = [product.rodzaj_zapiecia]
-        else:
-            product.rodzaj_zapiecia = []
-
-        product.save()
-
-
-def reverse_json_to_char(apps, schema_editor):
-    """Reverse: Convert JSON arrays back to CharField values"""
-    Product = apps.get_model('home', 'Product')
-    for product in Product.objects.all():
-        # Convert dla_kogo
-        if isinstance(product.dla_kogo, list) and product.dla_kogo:
-            product.dla_kogo = product.dla_kogo[0]
-        else:
-            product.dla_kogo = ''
-
-        # Convert kolor_pior
-        if isinstance(product.kolor_pior, list) and product.kolor_pior:
-            product.kolor_pior = product.kolor_pior[0]
-        else:
-            product.kolor_pior = ''
-
-        # Convert gatunek_ptakow
-        if isinstance(product.gatunek_ptakow, list) and product.gatunek_ptakow:
-            product.gatunek_ptakow = product.gatunek_ptakow[0]
-        else:
-            product.gatunek_ptakow = ''
-
-        # Convert rodzaj_zapiecia
-        if isinstance(product.rodzaj_zapiecia, list) and product.rodzaj_zapiecia:
-            product.rodzaj_zapiecia = product.rodzaj_zapiecia[0]
-        else:
-            product.rodzaj_zapiecia = ''
-
-        product.save()
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -73,7 +11,6 @@ class Migration(migrations.Migration):
 
     operations = [
         # First, convert existing data
-        migrations.RunPython(convert_char_to_json, reverse_json_to_char),
         migrations.AlterField(
             model_name="product",
             name="active",
