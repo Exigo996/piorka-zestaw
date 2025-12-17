@@ -1,11 +1,63 @@
 from django.db import models
 from django.core.exceptions import ValidationError
-from django.forms import CheckboxSelectMultiple
+from django import forms
 from django.utils.text import slugify
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel, InlinePanel
 from wagtail.models import Page, Orderable
 from modelcluster.fields import ParentalKey
 from modelcluster.models import ClusterableModel
+
+
+class ProductAdminForm(forms.ModelForm):
+    """Custom form for Product admin with proper multiselect handling"""
+
+    dla_kogo = forms.MultipleChoiceField(
+        choices=[],  # Will be set in __init__
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        label="Dla kogo"
+    )
+
+    kolor_pior = forms.MultipleChoiceField(
+        choices=[],
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        label="Kolor piór w przewadze"
+    )
+
+    gatunek_ptakow = forms.MultipleChoiceField(
+        choices=[],
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        label="Pióra zgubiły (gatunek)"
+    )
+
+    rodzaj_zapiecia = forms.MultipleChoiceField(
+        choices=[],
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        label="Rodzaj zapięcia"
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Set choices from model
+        self.fields['dla_kogo'].choices = Product.DLA_KOGO_CHOICES
+        self.fields['kolor_pior'].choices = Product.KOLOR_PIOR_CHOICES
+        self.fields['gatunek_ptakow'].choices = Product.GATUNEK_PTAKOW_CHOICES
+        self.fields['rodzaj_zapiecia'].choices = Product.RODZAJ_ZAPIECIA_CHOICES
+
+        # Set initial values from instance
+        if self.instance and self.instance.pk:
+            if self.instance.dla_kogo:
+                self.fields['dla_kogo'].initial = self.instance.dla_kogo
+            if self.instance.kolor_pior:
+                self.fields['kolor_pior'].initial = self.instance.kolor_pior
+            if self.instance.gatunek_ptakow:
+                self.fields['gatunek_ptakow'].initial = self.instance.gatunek_ptakow
+            if self.instance.rodzaj_zapiecia:
+                self.fields['rodzaj_zapiecia'].initial = self.instance.rodzaj_zapiecia
 
 
 class ProductImage(Orderable):
@@ -132,6 +184,8 @@ class Product(ClusterableModel):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    base_form_class = ProductAdminForm
+
     panels = [
         MultiFieldPanel([
             FieldPanel('slug'),
@@ -152,19 +206,19 @@ class Product(ClusterableModel):
         InlinePanel('images', label="Zdjęcia", help_text="Pierwsze zdjęcie będzie wyświetlane jako główne w sklepie"),
         MultiFieldPanel([
             FieldPanel('przeznaczenie_ogolne'),
-            FieldPanel('dla_kogo', widget=CheckboxSelectMultiple(choices=DLA_KOGO_CHOICES)),
+            FieldPanel('dla_kogo'),
         ], heading="Przeznaczenie"),
         MultiFieldPanel([
             FieldPanel('dlugosc_kategoria'),
             FieldPanel('dlugosc_w_cm'),
         ], heading="Wymiary"),
         MultiFieldPanel([
-            FieldPanel('kolor_pior', widget=CheckboxSelectMultiple(choices=KOLOR_PIOR_CHOICES)),
-            FieldPanel('gatunek_ptakow', widget=CheckboxSelectMultiple(choices=GATUNEK_PTAKOW_CHOICES)),
+            FieldPanel('kolor_pior'),
+            FieldPanel('gatunek_ptakow'),
         ], heading="Pióra"),
         MultiFieldPanel([
             FieldPanel('kolor_elementow_metalowych'),
-            FieldPanel('rodzaj_zapiecia', widget=CheckboxSelectMultiple(choices=RODZAJ_ZAPIECIA_CHOICES)),
+            FieldPanel('rodzaj_zapiecia'),
         ], heading="Elementy metalowe i zapięcia"),
         MultiFieldPanel([
             FieldPanel('stripe_product_id'),
@@ -250,9 +304,6 @@ class Product(ClusterableModel):
             self.gatunek_ptakow = []
         if self.rodzaj_zapiecia is None:
             self.rodzaj_zapiecia = []
-
-        # Run validation before saving
-        self.full_clean()
 
         super().save(*args, **kwargs)
 
