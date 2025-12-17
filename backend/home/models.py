@@ -1,10 +1,31 @@
 from django.db import models
 from django.forms import CheckboxSelectMultiple
 from django.utils.text import slugify
-from wagtail.admin.panels import FieldPanel, MultiFieldPanel
-from wagtail.models import Page
+from wagtail.admin.panels import FieldPanel, MultiFieldPanel, InlinePanel
+from wagtail.models import Page, Orderable
+from modelcluster.fields import ParentalKey
+from modelcluster.models import ClusterableModel
 
-class Product(models.Model):
+
+class ProductImage(Orderable):
+    """Product image with ordering support"""
+    product = ParentalKey('Product', on_delete=models.CASCADE, related_name='images')
+    image = models.ForeignKey(
+        'wagtailimages.Image',
+        on_delete=models.CASCADE,
+        related_name='+'
+    )
+
+    panels = [
+        FieldPanel('image'),
+    ]
+
+    class Meta:
+        verbose_name = "Zdjęcie produktu"
+        verbose_name_plural = "Zdjęcia produktu"
+
+
+class Product(ClusterableModel):
     # Choices for fields
     PRZEZNACZENIE_CHOICES = [
         ('kolczyki_para', 'Do ucha - kolczyki (para)'),
@@ -95,13 +116,6 @@ class Product(models.Model):
     active = models.BooleanField(default=True, verbose_name="Czy dostepny w sklepie")
 
     featured = models.BooleanField(default=False, verbose_name="Wyróżnij na stronie głównej")
-    
-    image = models.ForeignKey(
-        'wagtailimages.Image',
-        null=True, blank=True,
-        on_delete=models.SET_NULL,
-        related_name='+'
-    )
 
     # New fields
     nr_w_katalogu_zdjec = models.CharField(max_length=255, blank=True, verbose_name="Nr w katalogu zdjęć")
@@ -134,7 +148,7 @@ class Product(models.Model):
             FieldPanel('price'),
             FieldPanel('cena'),
         ], heading="Ceny"),
-        FieldPanel('image'),
+        InlinePanel('images', label="Zdjęcia", help_text="Pierwsze zdjęcie będzie wyświetlane jako główne w sklepie"),
         MultiFieldPanel([
             FieldPanel('przeznaczenie_ogolne'),
             FieldPanel('dla_kogo', widget=CheckboxSelectMultiple(choices=DLA_KOGO_CHOICES)),
