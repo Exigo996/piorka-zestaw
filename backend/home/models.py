@@ -6,9 +6,10 @@ from wagtail.admin.panels import FieldPanel, MultiFieldPanel, InlinePanel
 from wagtail.models import Page, Orderable
 from modelcluster.fields import ParentalKey
 from modelcluster.models import ClusterableModel
+from modelcluster.forms import ClusterForm
 
 
-class ProductAdminForm(forms.ModelForm):
+class ProductAdminForm(ClusterForm):
     """Custom form for Product admin with proper multiselect handling"""
 
     dla_kogo = forms.MultipleChoiceField(
