@@ -182,6 +182,12 @@ class Product(ClusterableModel):
             self.slug = slug
         super().save(*args, **kwargs)
 
+    @property
+    def primary_image(self):
+        """Returns the first image (main product image)"""
+        first_image = self.images.first()
+        return first_image.image if first_image else None
+
     def __str__(self):
         return self.name
 
