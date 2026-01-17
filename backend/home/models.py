@@ -183,8 +183,8 @@ class Product(ClusterableModel):
 
     slug = models.SlugField(unique=True, blank=True, help_text="Automatycznie generowane z nazwy")
     
-    description = RichTextField(blank=True, verbose_name="Opis (ang.)")
-    opis = RichTextField(blank=True, verbose_name="Opis (pl.)")
+    description = RichTextField(blank=True, verbose_name="Opis (ang.)", default=" ")
+    opis = RichTextField(blank=True, verbose_name="Opis (pl.)", default=" ")
 
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Cena podstawowa")
     cena = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name="Cena promocyjna")
